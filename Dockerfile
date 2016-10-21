@@ -13,6 +13,7 @@ ADD sites-available /etc/apache2/sites-available
 COPY bin/ /opt/docker/
 RUN chmod +x /opt/docker/*.sh
 
+RUN a2enmod headers
 RUN a2enmod rewrite
 RUN a2enmod proxy
 RUN a2enmod proxy_fcgi
