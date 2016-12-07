@@ -5,7 +5,10 @@ RUN echo 'deb http://ftp.fr.debian.org/debian/ jessie non-free' >> /etc/apt/sour
 RUN echo 'deb-src http://ftp.fr.debian.org/debian/ jessie non-free' >> /etc/apt/sources.list
 RUN apt-get update
 RUN apt-get -y install apache2 libapache2-mod-fastcgi
+RUN apt-get -y install openssl
 
+RUN openssl req -x509 -newkey rsa:4086 -keyout etc/apache2/key.pem -out etc/apache2/cert.pem \
+-days 3650 -nodes -sha256 -subj "/C=US/ST=Denial/L=Springfield/O=Dis/CN=docker.local"
 RUN rm /etc/apache2/sites-enabled/*
 
 ADD conf-available /etc/apache2/conf-available
@@ -17,13 +20,17 @@ RUN a2enmod headers
 RUN a2enmod rewrite
 RUN a2enmod proxy
 RUN a2enmod proxy_fcgi
+RUN a2enmod proxy_http
+RUN a2enmod ssl
 RUN a2enconf servername
 RUN a2ensite 000-default
+RUN a2ensite 000-default-ssl
 
 # Create aliases
 RUN echo 'alias ll="ls -la"' >> ~/.bashrc
 
 EXPOSE 80
+EXPOSE 443
 
 VOLUME /var/www
 
